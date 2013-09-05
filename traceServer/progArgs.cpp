@@ -24,6 +24,11 @@ progArgs::progArgs(int argc, char** argv) {
     // let's do input argument parsing
     //--------------------------------
     
+    // using default values
+    if(argc <2) {
+        cout<<"Using default configuration values"<<endl;
+        return;
+    }
     // put argv into 1-dim array
     int len_input=0;
     for(int i=1;i<argc;i++) {
@@ -74,11 +79,11 @@ progArgs::progArgs(int argc, char** argv) {
             } else if(atoi(pch) == 0) {
                 strictDest = false;
             } else {
-                invalidInput();
+                invalidInput("strict_dest can only be 0 or 1");
             }
         }
         else {
-            invalidInput();
+            invalidInput("Most likely rate is screwed up");
         }
         pch = strtok(NULL,delim);
     }
@@ -103,8 +108,34 @@ void progArgs::usage() {
     }
 }
 
-void progArgs::invalidInput() {
-    cerr<<"Invalid Argument Input"<<endl;
+void progArgs::checkArgs() {
+    // check port number range
+    if( !( (port >= 1025) && (port <= 65535))) {
+        invalidInput("port number not accepted");
+    }
+    // check rate
+    if( (reqPerSec->getReq() <=0) || (reqPerSec->getSec() <=0)) {
+        invalidInput("rate not accepted");
+    }
+    // check concurrent users
+    if( maxUsers <=0) {
+        invalidInput("number of max concurrent users not accepted");
+    }
+}
+
+void progArgs::invalidInput(const char* err_msg) {
+    cout<<"*********************************************"<<endl;
+    cout<<*this<<endl;
+    cout<<"*********************************************"<<endl;
+    cerr<<"Invalid Argument Input: " << err_msg<<endl;
     usage();
     exit(EXIT_FAILURE);
+}
+
+ostream& operator << (ostream& output, const progArgs& pa) {
+    output<<"Port number: "<<pa.port<<endl;
+    output<<"Max number of concurrent users: "<<pa.maxUsers<<endl;
+    output<<"Requests per seconds (Rate): "<<*(pa.reqPerSec)<<endl;
+    output<<"Strict destination: "<<pa.strictDest;
+    return output;
 }

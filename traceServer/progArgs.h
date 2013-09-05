@@ -18,15 +18,20 @@ class rate {
 };
 class progArgs {
     private:
-        int16_t port;
+        int32_t port;
         rate* reqPerSec;
         int32_t maxUsers;
         bool strictDest;
     public:
         progArgs(int argc, char** argv);
         ~progArgs();
-        void usage();   // print usage of how to invoke this program
-        void checkArgs();   // check validity of arguments, port, maxUsers, etc
-        void invalidInput();    // print error message for invalid arguments
+        // print usage of how to invoke this program
+        void usage();   
+        // check validity of arguments, port, maxUsers, etc
+        void checkArgs();   
+        // print error message for invalid arguments
+        void invalidInput(const char* err_msg);    
+        // over load operator <<
+        friend ostream& operator << (ostream& output, const progArgs& pa);
 };
 #endif

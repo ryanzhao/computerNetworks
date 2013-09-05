@@ -1,23 +1,29 @@
----------------------------------------
+=======================================
 Usage: ./traceServer [option] [value]
----------------------------------------
-----------------------
+=======================================
+---------------------------
 PORT/--port=/-p num_port:
-----------------------
-This is to specify the port number traceServer should be listening.'num_port' should be between 1025 to 65536, inclusive; default value is 1216. 
+---------------------------
+This is to specify the port number traceServer should be listening.'num_port'
+should be between 1025 to 65535, both inclusive; default value is 1216. 
     e.g. ./traceServer -p 1029
 -----------------------------------
 RATE/--rate=/-r requests seconds:
 -----------------------------------
-For each client, it can only issue an limited amount of requests during a period of time. Default value is 4 requests per 60 seconds.
+For each client, it can only issue an limited amount of requests during a
+period of time. Both requests and seconds should be positive integer. Default
+value is 4 requests per 60 seconds.
     e.g. ./traceServer -r 5 60
 --------------------------------------
 MAX_USERS/--max_users=/-u num_users:
 --------------------------------------
-This is to specify maximun number of concurrent users.Default value is 2. 
+This is to specify maximun number of concurrent users. num_users should be
+positive integer. Default value is 2. 
     e.g. ./traceServer MAX_USERS 5 
 ------------------------------------
 STRICT_DEST/--strict_dest=/-s 0/1:
 ------------------------------------
-You have the option of allowing users to only send traceroutes to their own IP address. This is to reduce abuse complaints or to prevent its usage in DDoS attacks. '0' for not putting this restriction and '1' otherwise. Default is 0.
+You have the option of allowing users to only send traceroutes to their own IP
+address. This is to reduce abuse complaints or to prevent its usage in DDoS
+attacks. '0' for not putting this restriction and '1' otherwise. Default is 0.
     e.g. ./traceroutes --strict_dest=1

@@ -42,5 +42,7 @@ int main(int argc, char** argv) {
     //}
     //freeaddrinfo(servinfo);
     progArgs pa=progArgs(argc,argv);
+    pa.checkArgs();
+    cout<<pa<<endl;
     return 0;
 }
