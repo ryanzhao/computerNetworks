@@ -1,4 +1,5 @@
 #include"progArgs.h"
+#include"eventsLog.h"
 #include<cstdlib>
 #include<iostream>
 #include<cstring>
@@ -41,8 +42,10 @@ int main(int argc, char** argv) {
     //    cout<<ipver<<": "<<ipstr<<endl;
     //}
     //freeaddrinfo(servinfo);
-    progArgs pa=progArgs(argc,argv);
-    pa.checkArgs();
-    cout<<pa<<endl;
+    //progArgs pa(argc,argv);
+    //pa.checkArgs();
+    //cout<<pa<<endl;
+    eventsLog el;
+    el.logIt("what the fuck");
     return 0;
 }
