@@ -83,7 +83,7 @@ progArgs::progArgs(int argc, char** argv) {
             }
         }
         else {
-            invalidInput("Most likely rate is screwed up");
+            invalidInput("Most likely input is non-sense or rate is screwed up");
         }
         pch = strtok(NULL,delim);
     }
@@ -94,7 +94,7 @@ progArgs::~progArgs() {
 }
 
 void progArgs::usage() {
-    ifstream infile("usage.txt");
+    ifstream infile("text/usage.txt");
     if( infile.is_open()) {
         string line;
         while( infile.good()) {
@@ -103,7 +103,7 @@ void progArgs::usage() {
         }
         infile.close();
     } else {
-        cerr<<"File 'usage.txt' open failed"<<endl;
+        cerr<<"File 'text/usage.txt' open failed"<<endl;
         exit(EXIT_FAILURE);
     }
 }

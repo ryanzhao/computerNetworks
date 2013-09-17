@@ -1,5 +1,14 @@
+//----------------------------------------------------------------------------
+//========================================
+// Weiran Zhao, Computer Science Dept
+// Indiana University, Bloomington
+//========================================
+// Started: before Tue,Sep 17th 2013 09:39:19 AM EDT
+// Last Modified: Tue,Sep 17th 2013 10:13:43 AM EDT
+//----------------------------------------------------------------------------
 #include"progArgs.h"
 #include"eventsLog.h"
+#include"lib/sockWrap.h"
 #include<cstdlib>
 #include<iostream>
 #include<cstring>
@@ -7,45 +16,40 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<arpa/inet.h>
+#include<unistd.h>
 
 using namespace std;
+#define PORT 6666
+#define LISTENQ 10
 
 int main(int argc, char** argv) {
-    //int status;
-    //struct addrinfo hints;
-    //struct addrinfo *servinfo, *p;
-    //char ipstr[INET6_ADDRSTRLEN];
-    //memset(&hints, 0, sizeof(hints));
+    int listenfd, connfd;
+    socklen_t clilen;
+    struct sockaddr_in servaddr, cliaddr;
+    // socket
+    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
+    // prepare servaddr for bind
+    memset(&servaddr, sizeof(servaddr), 0);
+    servaddr.sin_family = AF_INET;
+    // bind to any address available
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(PORT);
+    // bind
+    Bind(listenfd, (SA *) & servaddr, sizeof(servaddr));
+    // listen
+    Listen(listenfd, LISTENQ);
+    // accept
+    clilen = sizeof(cliaddr);
+    // clilen is value-result parameters
+    connfd = Accept(listenfd, (SA *) &cliaddr, &clilen);
+    close(listenfd);
+    write(connfd,"hell0 world\n", 15);
+    close(connfd);
 
-    //hints.ai_family = AF_UNSPEC;
-    //hints.ai_socktype = SOCK_STREAM;
-    //hints.ai_flags = AI_PASSIVE;
-
-    //if((status = getaddrinfo(NULL,"1234",&hints, &servinfo))!=0) {
-    //    cerr<<"getaddrinfo error"<<endl;
-    //    exit(1);
-    //}
-    //for(p = servinfo; p != NULL; p = p->ai_next) {
-    //    char* ipver = new char[5];
-    //    void* addr;
-    //    if(p->ai_family == AF_INET) {
-    //        struct sockaddr_in *ipv4 = (struct sockaddr_in*) p->ai_addr;
-    //        addr = &(ipv4->sin_addr);
-    //        strcpy(ipver, "IPV4");
-    //    } else {
-    //        struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *) p->ai_addr;
-    //        addr = &(ipv6->sin6_addr);
-    //        strcpy(ipver, "IPV6");
-    //    }
-
-    //    inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr));
-    //    cout<<ipver<<": "<<ipstr<<endl;
-    //}
-    //freeaddrinfo(servinfo);
-    //progArgs pa(argc,argv);
-    //pa.checkArgs();
-    //cout<<pa<<endl;
-    eventsLog el;
-    el.logIt("what the fuck");
+    // progArgs pa(argc,argv);
+    // pa.checkArgs();
+    // cout<<pa<<endl;
+    // eventsLog el;
+    // el.logIt("what the fuck");
     return 0;
 }
