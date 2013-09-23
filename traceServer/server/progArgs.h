@@ -1,5 +1,13 @@
+//----------------------------------------------------------------------------
 // Define a class to parse input argument of traceServer and check the validity
 // of these parameters, if no parameters specified, use defaults.
+//========================================
+// Weiran Zhao, Computer Science Dept
+// Indiana University, Bloomington
+//========================================
+// Started: a week or so before Tue,Sep 17th 2013 05:46:20 PM EDT
+// Last Modified: Tue,Sep 17th 2013 05:46:59 PM EDT
+//----------------------------------------------------------------------------
 #ifndef PROG_ARGS_H_
 #define PROG_ARGS_H_
 #include<stdint.h>

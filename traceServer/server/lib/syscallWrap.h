@@ -12,6 +12,8 @@
 //------------
 //  [1]: W. Richard Stevens, Unix network programming, Vol 1, 1998
 //-----------------------------------------------------------------------------
+#ifndef SYSCALL_WRAP_H_
+#define SYSCALL_WRAP_H_
 #include<sys/types.h>
 #include<sys/socket.h>
 
@@ -23,4 +25,6 @@ int Socket(int family, int type, int protocol);
 int Bind(int socket, const struct sockaddr *address, socklen_t address_len);
 int Listen(int socket, int backlog);
 int Accept(int socket, struct sockaddr *address, socklen_t *address_len);
-
+// close a file descriptor
+int Close(int fildes);
+#endif

@@ -1,8 +1,8 @@
 CPP = g++
 LD = g++
 
-traceServer: progArgs.o eventsLog.o lib/sockWrap.o serverMain.o
-	$(LD) -o traceServer progArgs.o eventsLog.o lib/sockWrap.o serverMain.o
+traceServer: progArgs.o eventsLog.o lib/syscallWrap.o serverMain.o
+	$(LD) -o traceServer progArgs.o eventsLog.o lib/syscallWrap.o serverMain.o
 
 progArgs.o: progArgs.h progArgs.cpp
 	$(CPP) -c progArgs.cpp
@@ -10,8 +10,8 @@ progArgs.o: progArgs.h progArgs.cpp
 eventsLog.o: eventsLog.h eventsLog.cpp
 	$(CPP) -c eventsLog.cpp
 
-sockWrap.o: lib/sockWrap.h lib/sockWrap.cpp
-	$(CPP) -c lib/sockWrap.cpp
+syscallWrap.o: lib/syscallWrap.h lib/syscallWrap.cpp
+	$(CPP) -c lib/syscallWrap.cpp
 
 serverMain.o: serverMain.cpp
 	$(CPP) -c serverMain.cpp

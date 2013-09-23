@@ -1,6 +1,7 @@
-#include"sockWrap.h"
+#include"syscallWrap.h"
 #include<cstdio>
 #include<cstdlib>
+#include<unistd.h>
 
 void sys_err(const char * msg) {
     perror(msg);
@@ -36,5 +37,13 @@ int Accept(int socket, struct sockaddr *address, socklen_t *address_len) {
     if( (n=accept(socket, address, address_len)) < 0) {
         sys_err("call to accept failed");
     } 
+    return n;
+}
+
+int Close(int fildes) {
+    int n;
+    if( (n=close(fildes)) < 0) {
+        sys_err("call to close() failed");
+    }
     return n;
 }
