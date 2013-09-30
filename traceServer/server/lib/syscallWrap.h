@@ -16,6 +16,7 @@
 #define SYSCALL_WRAP_H_
 #include<sys/types.h>
 #include<sys/socket.h>
+#include<signal.h>
 
 // avoid typing the long 'struct sockaddr'
 typedef struct sockaddr SA;
@@ -27,4 +28,12 @@ int Listen(int socket, int backlog);
 int Accept(int socket, struct sockaddr *address, socklen_t *address_len);
 // close a file descriptor
 int Close(int fildes);
+//-------------------------------------------------
+// portable and reliable version of signal handling
+//-------------------------------------------------
+// for signal handlers  
+typedef void    Sigfunc(int);  
+Sigfunc * signal(int signo, Sigfunc *func);
+// wrapper for signal function
+Sigfunc * Signal(int signo, Sigfunc *func);
 #endif

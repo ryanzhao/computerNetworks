@@ -6,7 +6,7 @@
 // Indiana University, Bloomington
 //========================================
 // Started: a week or so before Tue,Sep 17th 2013 05:46:20 PM EDT
-// Last Modified: Tue,Sep 17th 2013 05:46:59 PM EDT
+// Last Modified: Sun,Sep 29th 2013 12:01:08 PM EDT
 //----------------------------------------------------------------------------
 #ifndef PROG_ARGS_H_
 #define PROG_ARGS_H_
@@ -27,12 +27,18 @@ class rate {
         friend ostream & operator << (ostream & output, const rate & r);
 };
 class progArgs {
-    private:
-        int32_t port;
-        rate* reqPerSec;
-        int32_t maxUsers;
-        bool strictDest;
     public:
+        static const int32_t listenQ = 10; // listen Queue for listen socket
+        //-------------
+        // class member
+        //-------------
+        int32_t port;       // port number
+        rate* reqPerSec;    // number of request per xx seconds
+        int32_t maxUsers;   // max concurrent users
+        bool strictDest;    // strict destination
+        //--------------
+        // class methods
+        //--------------
         progArgs(int argc, char** argv);
         ~progArgs();
         // print usage of how to invoke this program

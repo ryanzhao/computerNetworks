@@ -4,7 +4,7 @@
 // Indiana University, Bloomington
 //========================================
 // Started: before Tue,Sep 17th 2013 05:44:55 PM EDT
-// Last Modified: Tue,Sep 17th 2013 05:45:38 PM EDT
+// Last Modified: Sun,Sep 29th 2013 11:48:52 AM EDT
 //----------------------------------------------------------------------------
 #include"progArgs.h"
 #include<cstring>
@@ -95,6 +95,7 @@ progArgs::progArgs(int argc, char** argv) {
         }
         pch = strtok(NULL,delim);
     }
+    this->checkArgs();
 }
 
 progArgs::~progArgs() {
