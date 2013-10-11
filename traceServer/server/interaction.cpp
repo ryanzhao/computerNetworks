@@ -4,7 +4,7 @@
 // Indiana University, Bloomington
 //========================================
 // Started: Thu,Oct 10th 2013 11:15:36 PM EDT
-// Last Modified: Thu,Oct 10th 2013 11:45:28 PM EDT
+// Last Modified: Fri,Oct 11th 2013 11:45:28 AM EDT
 //----------------------------------------------------------------------------
 #include"interaction.h"
 #include<cstring>
@@ -30,7 +30,7 @@ void interaction::takeAction() {
             traceMe();
             break;
         case FNAME:
-            dprintf(connfd,"traceroute file with name: %s\n",ipHostFname);
+            traceFname();
             break;
         case IPHOST:
             traceIpHost(ipHostFname);
@@ -112,7 +112,7 @@ int interaction::parseInput() {
 }
 
 void interaction::quit() {
-    dprintf(connfd, "quit request from client received, quitting...\n");
+    dprintf(connfd, "QUIT Request from client received, quitting...\n");
     Close(connfd);
     exit(0);
 }
@@ -138,6 +138,8 @@ void interaction::traceIpHost(const char* ipHost) {
         // redirect stderr and stdout to connfd
         Dup2(connfd, STDOUT_FILENO);
         Dup2(connfd, STDERR_FILENO);
+        cout<<"------------------------------------------"
+            <<"----------------------------------"<<endl;
         // call execlp 'NULL' must be provided
         execlp("traceroute","traceroute",ipHost, NULL);
     } else {// in parent
@@ -159,4 +161,37 @@ void interaction:: traceMe() {
     inet_ntop(AF_INET, &(clientAddr->sin_addr), ipHostFname,BUFSIZE);
     dprintf(connfd,"%s\n",ipHostFname);
     traceIpHost(ipHostFname);
+}
+
+void interaction::traceFname() {
+    FILE* fFname = fopen(ipHostFname,"r");
+    if(fFname==NULL) {
+        sys_err("call to fopen() failed");
+    }
+    // read till the end of file
+    char* pch;
+    const char* delim=" ";
+    while(Fgets(ipHostFname, BUFSIZE, fFname)==1) {
+        //---------------------------------
+        // remove '\n' at the end of string
+        //---------------------------------
+        ipHostFname[strlen(ipHostFname)-1]=0;
+        pch = strtok(ipHostFname,delim);
+        //--------------------------------------------------------
+        //This magic number 'ipHostFname+strlen(ipHostFname)+1' is
+        //the address of strings followed 'traceroute'
+        //--------------------------------------------------------
+        char* magic = ipHostFname+strlen(ipHostFname)+1;
+        if(strcmp(pch,"traceroute")==0) {
+            // check if traceroute 'me'
+            if(strcmp(magic,"me")==0) {
+                traceMe();
+            } else {
+                traceIpHost(magic);
+            }
+        } else {
+            dprintf(connfd, "INVALID INPUT in file: %s %s", ipHostFname, magic);
+        }
+    }
+    fclose(fFname);
 }

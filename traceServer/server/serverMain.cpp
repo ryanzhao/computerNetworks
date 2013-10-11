@@ -18,12 +18,14 @@
 //           connection (aka fdopen, fgets, fputs)
 // Modified: Wed,Oct 09th 2013 09:08:09 PM EDT
 //           Add handle for automatic timeout of client if no input for 30sec
-// Last Modified: Thu,Oct 10th 2013 11:42:31 PM EDT
+// Modified: Fri,Oct 11th 2013 11:47:43 AM EDT
+//           Finish client server interaction
+// Last Modified: Fri,Oct 11th 2013 12:08:43 PM EDT
 //----------------------------------------------------------------------------
 #include"progArgs.h"
-#include"eventsLog.h"
 #include"lib/syscallWrap.h"
 #include"misc.h"
+#include"eventsLog.h"
 #include<cstdlib>
 #include<cstdio>
 #include<iostream>
@@ -35,15 +37,14 @@
 #include<sys/wait.h>
 #include"interaction.h"
 
+// start server log 
+eventsLog servLog;
+
 int main(int argc, char** argv) {
     //-------------------------------------------
     // parse input argument and store it in pArgs
     //-------------------------------------------
     progArgs pArgs(argc,argv);
-    //-----------------
-    // start server log
-    //-----------------
-    eventsLog servLog;
 
     //-----------------------------------------------------
     // prepare server's listening sockets and starts listen
@@ -68,7 +69,7 @@ int main(int argc, char** argv) {
     // signal handlers
     //----------------
     Signal(SIGCHLD, sigchld_listen_handler);
-    //Signal(SIGINT,sigint_listen_handler);
+    Signal(SIGINT,sigint_listen_handler);
     //----------------------------------
     // seek chance to accept from client
     //----------------------------------
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
         } else if(chd_pid==0) {     // child process
             // restore sigint signal handler
             signal(SIGINT, SIG_DFL);
-            signal(SIGCHLD, SIG_DFL);
+            //signal(SIGCHLD, SIG_DFL);
             // close listening file descriptor inherited from parent
             Close(listenfd);
             //---------------------------------------------

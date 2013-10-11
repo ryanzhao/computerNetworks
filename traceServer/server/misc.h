@@ -6,7 +6,7 @@
 // Indiana University, Bloomington
 //========================================
 // Started: Wed,Oct 02th 2013 03:45:43 PM EDT
-// Last Modified: Thu,Oct 10th 2013 03:55:16 PM EDT
+// Last Modified: Fri,Oct 11th 2013 12:09:35 PM EDT
 //----------------------------------------------------------------------------
 #ifndef _MISC_H_
 #define _MISC_H_
@@ -14,6 +14,7 @@
 #include<iostream>
 #include<cstdio>
 #include<cstdlib>
+#include"eventsLog.h"
 using namespace std;
 
 // temp buffer size, mostly for char

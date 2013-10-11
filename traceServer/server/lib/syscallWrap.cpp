@@ -5,11 +5,14 @@
 // Indiana University, Bloomington
 //========================================
 // Started: the same day as "syscallWrap.h"
-// Last Modified: Thu,Oct 10th 2013 10:06:31 PM EDT
+// Modified: Fri,Oct 11th 2013 11:29:11 AM EDT
+//           Let Fgets() clear 'str' buffer each time it is called
+// Last Modified: Fri,Oct 11th 2013 11:30:08 AM EDT
 //----------------------------------------------------------------------------
 #include"syscallWrap.h"
 #include<cstdio>
 #include<cstdlib>
+#include<cstring>
 #include<unistd.h>
 #include<errno.h>
 
@@ -146,6 +149,8 @@ FILE* Fdopen(int fd, const char *mode) {
 }
 
 int Fgets(char* str, int size, FILE* stream) {
+    // clear str buffer
+    memset(str,0,size);
     // clear errno
     int olderrno=errno;
     errno = 0;

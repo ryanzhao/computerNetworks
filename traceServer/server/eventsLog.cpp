@@ -5,15 +5,19 @@
 // Indiana University, Bloomington
 //========================================
 // Started: before Tue,Sep 17th 2013 05:44:55 PM EDT
-// Last Modified: Wed,Oct 02th 2013 03:41:37 PM EDT
+// Modified: Thu,Oct 10th 2013 11:56:08 PM EDT
+//           change 'log.txt' access mode to append
+// Last Modified: Fri,Oct 11th 2013 12:11:10 PM EDT
 //----------------------------------------------------------------------------
 #include"eventsLog.h"
 #include<iostream>
 #include<ctime>
 eventsLog::eventsLog(){
-    outfile.open("log.txt");
+    outfile.open("log.txt", ofstream::app);
     if(outfile.is_open()) {
-        outfile<<timestamp()<<"Server Started!"<<endl;
+        outfile<<"-----------------------------------------------"
+            <<"-----------------------------"<<endl;
+        outfile<<timestamp()<<"Server started!"<<endl;
     } else {
         cerr<<"File 'log.txt' open failed"<<endl;
     }
