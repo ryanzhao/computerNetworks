@@ -7,38 +7,40 @@
 // Started: before Tue,Sep 17th 2013 05:44:55 PM EDT
 // Modified: Thu,Oct 10th 2013 11:56:08 PM EDT
 //           change 'log.txt' access mode to append
-// Last Modified: Fri,Oct 11th 2013 12:11:10 PM EDT
+// Modified: Fri,Oct 11th 2013 12:16:09 PM EDT
+//           Modify logIt() function, let it take arguments of variable length
+//           Also has to change to use FILE stream instead of ofstream
+// Last Modified: Fri,Oct 11th 2013 12:52:18 PM EDT
 //----------------------------------------------------------------------------
 #include"eventsLog.h"
-#include<iostream>
-#include<ctime>
 eventsLog::eventsLog(){
-    outfile.open("log.txt", ofstream::app);
-    if(outfile.is_open()) {
-        outfile<<"-----------------------------------------------"
-            <<"-----------------------------"<<endl;
-        outfile<<timestamp()<<"Server started!"<<endl;
-    } else {
-        cerr<<"File 'log.txt' open failed"<<endl;
-    }
+    ofile = fopen("log.txt","a");
+    const char* delim = "------------------------------------------------"
+                        "----------------------------";
+    fprintf(ofile,"%s\n",delim);
+    logIt("Server started!\n");
 }
 
 eventsLog::~eventsLog() {
-    outfile.close();
+    fclose(ofile);
 }
 
-void eventsLog::logIt(const char* msg) {
-    if(outfile.is_open()) {
-        outfile<<timestamp()<<msg<<endl;
+void eventsLog::logIt(const char* format,...) {
+    if(ofile!=NULL) {
+        fprintf(ofile,"%s",timestamp());
+        va_list args;
+        va_start(args, format);
+        vfprintf(ofile, format, args);
+        va_end(args);
     } else {
-        cerr<<"File 'log.txt' not open"<<endl;
+        fprintf(stderr,"File 'log.txt' not open\n");
     }
 }
 
-string eventsLog::timestamp() {
-    char buffer[20];
+char* eventsLog::timestamp() {
+    memset(timeStampBuff,0,20);
     time_t raw_t=time(NULL);
     struct tm* timeInfo = localtime(&raw_t);
-    strftime(buffer,20,"%D %T ",timeInfo);
-    return string(buffer);
+    strftime(timeStampBuff,20,"%D %T ",timeInfo);
+    return timeStampBuff;
 }

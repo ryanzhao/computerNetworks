@@ -28,7 +28,7 @@ void sigchld_listen_handler(int sig) {
 
 void sigint_listen_handler(int sig) {
     extern eventsLog servLog;
-    servLog.logIt("Server receive Interrupt signal, shutting down...");
+    servLog.logIt("Server receive Interrupt signal, shutting down...\n");
     cout<<"\nInterrupt received, will terminate ..."<<endl;
     exit(0);
 }
