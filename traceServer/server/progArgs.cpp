@@ -1,10 +1,11 @@
 //----------------------------------------------------------------------------
+// Check "progArags.h" for details
 //========================================
 // Weiran Zhao, Computer Science Dept
 // Indiana University, Bloomington
 //========================================
 // Started: before Tue,Sep 17th 2013 05:44:55 PM EDT
-// Last Modified: Sun,Sep 29th 2013 11:48:52 AM EDT
+// Last Modified: Wed,Oct 02th 2013 03:41:52 PM EDT
 //----------------------------------------------------------------------------
 #include"progArgs.h"
 #include<cstring>

@@ -1,7 +1,17 @@
+//----------------------------------------------------------------------------
+// Check "syscallWrap.h" for details
+//========================================
+// Weiran Zhao, Computer Science Dept
+// Indiana University, Bloomington
+//========================================
+// Started: the same day as "syscallWrap.h"
+// Last Modified: Thu,Oct 10th 2013 10:06:31 PM EDT
+//----------------------------------------------------------------------------
 #include"syscallWrap.h"
 #include<cstdio>
 #include<cstdlib>
 #include<unistd.h>
+#include<errno.h>
 
 void sys_err(const char * msg) {
     perror(msg);
@@ -72,4 +82,94 @@ Sigfunc *Signal(int signo, Sigfunc *func) {
         sys_err("call to signal() failed");
     }
     return ret;
+}
+
+//----------------------------------------------------
+// directly copied from Unix network programming Pg 78
+//----------------------------------------------------
+ssize_t Read(int fd, void *vptr, size_t n) {
+    size_t nleft;
+    ssize_t nread;
+    char *ptr;
+
+    ptr = (char*) vptr;
+    nleft=n;
+    // main loop to read
+    while(nleft>0) {
+        if( (nread = read(fd, ptr, nleft)) <0) {
+            if (errno==EINTR) {
+                // a way to tell to restart
+                nread = 0;
+            } else {
+                return -1;
+            }
+        } else if (nread==0) {      // EOF
+            break;
+        }
+
+        nleft -= nread;
+        ptr += nread;
+    }
+    return (n-nleft);
+}
+
+//----------------------------------------------------
+// directly copied from Unix network programming Pg 78
+//----------------------------------------------------
+ssize_t Write(int fd, const void *vptr, size_t n) {
+    size_t nleft;
+    ssize_t nwritten;
+    char * ptr = (char*) vptr;
+    nleft = n;
+    // the main loop
+    while( nleft > 0) {
+        if( (nwritten = write(fd, ptr, nleft)) <=0) {
+            if (errno = EINTR) {
+                nwritten = 0;   // need to call write again
+            }
+            else {
+                return -1;
+            }
+        }
+        nleft -= nwritten;
+        ptr += nwritten;
+    }
+    return n;
+}
+FILE* Fdopen(int fd, const char *mode) {
+    FILE* f_fd=fdopen(fd, mode);
+    if(f_fd==NULL) {
+        sys_err("call to fdopen() failed");
+    } else {
+        return f_fd;
+    }
+}
+
+int Fgets(char* str, int size, FILE* stream) {
+    // clear errno
+    int olderrno=errno;
+    errno = 0;
+    while(fgets(str,size,stream)==NULL) {
+        if(errno == 0) {
+            errno = olderrno;
+            return 0;
+        }
+        if(errno == EINTR) {
+            printf("fgets() get interrupted, restarting\n");
+            continue;
+        } else {
+            sys_err("call to fgets() has error other than EINTR");
+            return -1;
+        }
+    }
+    return 1;
+}
+
+int Dup2(int fildes, int fildes2) {
+    int status;
+    status = dup2(fildes, fildes2);
+    if(status == -1) {
+        sys_err("call to dup2() failed");
+    }
+    return status;
 }

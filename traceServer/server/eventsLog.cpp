@@ -1,10 +1,11 @@
 //----------------------------------------------------------------------------
+// Check "eventsLog.h" for details
 //========================================
 // Weiran Zhao, Computer Science Dept
 // Indiana University, Bloomington
 //========================================
 // Started: before Tue,Sep 17th 2013 05:44:55 PM EDT
-// Last Modified: Tue,Sep 17th 2013 05:45:22 PM EDT
+// Last Modified: Wed,Oct 02th 2013 03:41:37 PM EDT
 //----------------------------------------------------------------------------
 #include"eventsLog.h"
 #include<iostream>

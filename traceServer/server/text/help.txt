@@ -1,0 +1,30 @@
+////////////////////////////////////////////////////////////////////////////////
+===========================
+valid input commands are:
+===========================
+------
+help
+------
+Display this information you are looking at
+------
+quit
+------
+Disconnect with server
+-----------------------
+traceroute [filename]
+-----------------------
+Do a batch of traceroute from 'filename', 'filename' should exist in the same
+directory as './traceroute', otherwise, it will be treated as 'ip addr' or 
+'host name'
+'filename' should contain lines of format as:
+traceroute [ip addr | host name]
+----------------------------------
+traceroute [ip addr | host name]
+----------------------------------
+To traceroute 'ip addr' or 'host name', same as what you can do with 
+'traceroute'
+---------------
+traceroute me
+---------------
+To traceroute 'yourself' from server
+////////////////////////////////////////////////////////////////////////////////

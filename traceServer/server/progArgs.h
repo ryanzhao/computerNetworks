@@ -6,7 +6,7 @@
 // Indiana University, Bloomington
 //========================================
 // Started: a week or so before Tue,Sep 17th 2013 05:46:20 PM EDT
-// Last Modified: Sun,Sep 29th 2013 12:01:08 PM EDT
+// Last Modified: Thu,Oct 10th 2013 03:01:04 PM EDT
 //----------------------------------------------------------------------------
 #ifndef PROG_ARGS_H_
 #define PROG_ARGS_H_
@@ -29,6 +29,7 @@ class rate {
 class progArgs {
     public:
         static const int32_t listenQ = 10; // listen Queue for listen socket
+        static const int32_t timeOut = 20; // automatic timeout if no input from user
         //-------------
         // class member
         //-------------

@@ -11,20 +11,32 @@
 // Reference: 
 //------------
 //  [1]: W. Richard Stevens, Unix network programming, Vol 1, 1998
+//========================================
+// Weiran Zhao, Computer Science Dept
+// Indiana University, Bloomington
+//========================================
+// Started: 2 ~ 3 weeks before Wed,Oct 02th 2013 04:14:48 PM EDT
+// Last Modified: Thu,Oct 10th 2013 10:11:09 PM EDT
 //-----------------------------------------------------------------------------
 #ifndef SYSCALL_WRAP_H_
 #define SYSCALL_WRAP_H_
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<signal.h>
+#include<unistd.h>
+#include<cstdio>
 
 // avoid typing the long 'struct sockaddr'
 typedef struct sockaddr SA;
 // print error message and quit the program, follow from Stevens
 void sys_err(const char*);
+// socket creation
 int Socket(int family, int type, int protocol);
+// bind "unamed" socket with address
 int Bind(int socket, const struct sockaddr *address, socklen_t address_len);
+// listen on a particular socket
 int Listen(int socket, int backlog);
+// accept a connection and return connected fd
 int Accept(int socket, struct sockaddr *address, socklen_t *address_len);
 // close a file descriptor
 int Close(int fildes);
@@ -33,7 +45,22 @@ int Close(int fildes);
 //-------------------------------------------------
 // for signal handlers  
 typedef void    Sigfunc(int);  
-Sigfunc * signal(int signo, Sigfunc *func);
 // wrapper for signal function
 Sigfunc * Signal(int signo, Sigfunc *func);
+//--------------------------------------------------
+// readn and writen read/write n bytes of data to fd
+// since read/write interruptable, thses two functions
+// will buffer what's been read and continue
+//--------------------------------------------------
+ssize_t Read(int fd, void *vpter, size_t n);
+ssize_t Write(int fd, const void *vptr, size_t n);
+// fdopen() open a file by file descriptor
+FILE* Fdopen(int fd, const char *mode);
+//---------------------------------------------------------------------
+// Fgets() takes care of error, return 1 for normal, 0 for end-of-file,
+// -1 for error other than EINTR, when EINTR, restart
+//---------------------------------------------------------------------
+int Fgets(char* str, int size, FILE* stream);
+// Dup2() with error checking
+int Dup2(int fildes, int fildes2);
 #endif
