@@ -6,7 +6,9 @@
 // Indiana University, Bloomington
 //========================================
 // Started: Wed,Oct 02th 2013 03:45:43 PM EDT
-// Last Modified: Fri,Oct 11th 2013 12:09:35 PM EDT
+// Modified: Sun,Oct 13th 2013 04:30:53 PM EDT
+//           Add userIp() function
+// Last Modified: Sun,Oct 13th 2013 04:31:33 PM EDT
 //----------------------------------------------------------------------------
 #ifndef _MISC_H_
 #define _MISC_H_
@@ -15,6 +17,8 @@
 #include<cstdio>
 #include<cstdlib>
 #include"eventsLog.h"
+#include<arpa/inet.h>
+#include<cstring>
 using namespace std;
 
 // temp buffer size, mostly for char
@@ -32,4 +36,8 @@ int setReadTimer(int fd, int sec);
 //----------------------------------
 void sigchld_listen_handler(int sig);
 void sigint_listen_handler(int sig);
+//--------------------------------------
+// return a string consisting of user ip
+//--------------------------------------
+char* userIp(struct sockaddr_in cliaddr);
 #endif

@@ -10,11 +10,14 @@
 // Modified: Fri,Oct 11th 2013 12:16:09 PM EDT
 //           Modify logIt() function, let it take arguments of variable length
 //           Also has to change to use FILE stream instead of ofstream
-// Last Modified: Fri,Oct 11th 2013 12:52:18 PM EDT
+// Last Modified: Sun,Oct 13th 2013 03:49:18 PM EDT
 //----------------------------------------------------------------------------
 #include"eventsLog.h"
 eventsLog::eventsLog(){
     ofile = fopen("log.txt","a");
+    // have to set this FILE stream line buffered or non-buffered
+//    setvbuf(ofile,NULL,_IOLBF,BUFSIZ);
+    setvbuf(ofile,NULL,_IOLBF,0);
     const char* delim = "------------------------------------------------"
                         "----------------------------";
     fprintf(ofile,"%s\n",delim);

@@ -20,7 +20,11 @@
 //           Add handle for automatic timeout of client if no input for 30sec
 // Modified: Fri,Oct 11th 2013 11:47:43 AM EDT
 //           Finish client server interaction
-// Last Modified: Fri,Oct 11th 2013 08:37:27 PM EDT
+// Modified: Sun,Oct 13th 2013 03:16:19 PM EDT
+//           Add handles for concurrent users 
+// Modified: Sun,Oct 13th 2013 04:42:36 PM EDT
+//           Add handling for client close connection instead of type 'quit'
+// Last Modified: Sun,Oct 13th 2013 04:43:40 PM EDT
 //----------------------------------------------------------------------------
 #include"progArgs.h"
 #include"lib/syscallWrap.h"
@@ -40,6 +44,8 @@
 
 // start server log 
 eventsLog servLog;
+// current number of users
+int numUsers=0;
 
 int main(int argc, char** argv) {
     //-------------------------------------------
@@ -76,16 +82,45 @@ int main(int argc, char** argv) {
     //----------------------------------
     pid_t chd_pid;
     while(1) {
-        // accept
+        //----------------------
+        // accept the connection
+        //----------------------
         clilen = sizeof(cliaddr);
         // clilen is value-result parameters
         connfd = Accept(listenfd, (SA *) &cliaddr, &clilen);
-        if(VOMIT) {
-            char str[INET_ADDRSTRLEN];
-            cout<<"get connection from: "
-                <<inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str))<<endl;
+
+        //------------------------------------------
+        // check if we are over max concurrent users
+        //------------------------------------------
+        if(++numUsers>pArgs.maxUsers) {
+            // notify the user and refuse the connection
+            dprintf(connfd, "-------------------------------------------"
+                    "---------------------------------\n");
+            dprintf(connfd, "We have reached max concurrent users for this"
+                    " server, which was set to %d\n", pArgs.maxUsers); 
+            dprintf(connfd, "Refusing this connection...\n");
+            dprintf(connfd, "-------------------------------------------"
+                    "---------------------------------\n");
+            Close(connfd);
+            // decrease num users
+            numUsers--;
+            // log this event
+            servLog.logIt("User from IP: %s get refused because we reached"
+                    " max concurrent users\n", userIp(cliaddr));
+            // continue
+            continue;
         }
+
+        //-----------
+        // debug info
+        //-----------
+        if(VOMIT) {
+            cout<<"get connection from: "<<userIp(cliaddr)<<endl;
+        }
+
+        //--------------------------------------
         // fork a child to handle client's input
+        //--------------------------------------
         if((chd_pid=fork())< 0) {  
             sys_err("call to fork() failed");
         } else if(chd_pid==0) {     // child process
@@ -93,7 +128,7 @@ int main(int argc, char** argv) {
             rateLimiting rateLimitor(pArgs.reqPerSec);
             // restore sigint signal handler
             signal(SIGINT, SIG_DFL);
-            //signal(SIGCHLD, SIG_DFL);
+            signal(SIGCHLD, SIG_DFL);
             // close listening file descriptor inherited from parent
             Close(listenfd);
             //---------------------------------------------
@@ -104,30 +139,39 @@ int main(int argc, char** argv) {
                 //-----------------------------------
                 // handles all kinds of client inputs
                 //-----------------------------------
-                interaction inter(connfd, &cliaddr, &rateLimitor);
+                interaction inter(connfd, &cliaddr, &rateLimitor, pArgs.strictDest);
                 FILE* fConn = Fdopen(connfd, "r+");
                 // get input from client
-                fgets(inter.getInBuff(),inter.BUFSIZE, fConn);
-                // handle input
-                inter.takeAction();
+                if(fgets(inter.getInBuff(),inter.BUFSIZE, fConn)!=NULL) {
+                    // handle input
+                    inter.takeAction();
+                } else if(feof(fConn)!=0) { // user close connection instead of typing 'quit'
+                    // log this event
+                    servLog.logIt("User from IP: %s close connection"
+                            " instead of typing 'quit'\n", userIp(cliaddr));
+                    Close(connfd);
+                    exit(0);
+                } else {
+                    sys_err("call to fgets() failed");
+                }
             }
             // error checking on setReadTimer (aka select())
             if(timerStat==-1) {
+                Close(connfd);
                 sys_err("call to select() failed");
             } else { // automatic time out happened
                 dprintf(connfd,"Automatic time out after no input of %d sec\n",pArgs.timeOut);
                 // log automatic time out
-                char tmp[TEMPBUFFSIZE];
-                char str[INET_ADDRSTRLEN];
-                sprintf(tmp,"Automatic time out from %s (with pid: %d), "
-                        "after no input of %d seconds\n",
-                        inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)),
-                        getpid(), pArgs.timeOut);
-                servLog.logIt(tmp);
+                servLog.logIt("Automatic time out from %s (with pid: %d),"
+                        " after no input of %d seconds\n",
+                        userIp(cliaddr), getpid(), pArgs.timeOut);
                 Close(connfd);
                 exit(0);
             } // timerStat
         } else {    // parent process
+            //-----------
+            // debug info
+            //-----------
             if(VOMIT) {
                 cout<<"listening process: "<<getpid()
                     <<" forked a child with pid: "<<chd_pid<<endl;

@@ -11,7 +11,7 @@
 // Modified: Fri,Oct 11th 2013 04:38:15 PM EDT
 //           add rate limiting functionality
 //           rate limitor is mainly handled by traceIpHost();
-// Last Modified: Sat,Oct 12th 2013 08:14:48 PM EDT
+// Last Modified: Sun,Oct 13th 2013 04:07:54 PM EDT
 //----------------------------------------------------------------------------
 #ifndef _INTERACTION_H_
 #define _INTERACTION_H_
@@ -47,6 +47,8 @@ class interaction {
         struct sockaddr_in *clientAddr;
         // rate limitor
         rateLimiting* rLimitor;
+        // strict destination or not
+        bool strict;
         //-----------------------
         // private function calls
         //-----------------------
@@ -64,8 +66,12 @@ class interaction {
         void traceMe();
         // parse input
         int parseInput();
+        // if strict is set to true, check the ip. In this case,
+        // the ip can only be the same as client's own ip, other ips are not
+        // allowed
+        bool isValidIp(const char* ipHost);
     public:
-        interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl);
+        interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl, bool s);
         // return inbuffer pointer
         char* getInBuff() { return inBuff;}
         // take action according to input

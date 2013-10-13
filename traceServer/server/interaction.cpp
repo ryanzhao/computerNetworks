@@ -9,17 +9,18 @@
 // Modified: Fri,Oct 11th 2013 04:38:15 PM EDT
 //           add rate limiting functionality
 //           rate limitor is mainly handled by traceIpHost();
-// Last Modified: Fri,Oct 11th 2013 08:42:41 PM EDT
+// Last Modified: Sun,Oct 13th 2013 04:34:35 PM EDT
 //----------------------------------------------------------------------------
 #include"interaction.h"
 #include<cstring>
 #include<arpa/inet.h>
 #include<unistd.h>
 #include"misc.h"
-interaction::interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl){
+interaction::interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl, bool s) {
     rLimitor = rl;
     connfd = fd;
     clientAddr = cliaddr;
+    strict = s;
     memset(inBuff,0, BUFSIZE);
     memset(ipHostFname,0, BUFSIZE);
 }
@@ -120,11 +121,9 @@ int interaction::parseInput() {
 void interaction::quit() {
     dprintf(connfd, "QUIT Request from client received, quitting...\n");
     // log this event
-    char str[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(clientAddr->sin_addr), str,sizeof(str));
     extern eventsLog servLog;
     servLog.logIt("User from IP: %s (with pid %d)"
-            "closes connection from server\n", str, getpid());
+            " closes connection from server\n", userIp(*clientAddr), getpid());
     Close(connfd);
     exit(0);
 }
@@ -142,7 +141,9 @@ void interaction::help() {
 }
 
 void interaction::traceIpHost(const char* ipHost) {
+    //-----------------------
     // check if we over limit
+    //-----------------------
     if(rLimitor->isOverLimit()) {
         // notify user
         dprintf(connfd, "*********************************************\n");
@@ -150,12 +151,18 @@ void interaction::traceIpHost(const char* ipHost) {
         dprintf(connfd, "%s\n",rLimitor->currentLimit());
         dprintf(connfd, "*********************************************\n");
         // log it
-        char str[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &(clientAddr->sin_addr), str,sizeof(str));
         extern eventsLog servLog;
         servLog.logIt("User from IP: %s (with pid %d)"
-                "making too many requests\n", str, getpid());
+                " making too many requests\n", userIp(*clientAddr), getpid());
         return;
+    }
+    //---------------------------------------------
+    // check if ip hinted by ipHost is valid or not
+    //---------------------------------------------
+    if(strict) {
+        if(!isValidIp(ipHost)) {
+            return;
+        }
     }
     pid_t child_pid;
     if((child_pid=fork())<0) {
@@ -221,4 +228,9 @@ void interaction::traceFname() {
         }
     }
     fclose(fFname);
+}
+
+bool interaction::isValidIp(const char* ipHost) {
+    // need to fill in code here
+    return true;
 }
