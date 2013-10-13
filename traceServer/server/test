@@ -1,0 +1,5 @@
+traceroute me
+traceroute localhost
+traceroute burrow.cs.indiana.edu
+traceroute 173.194.46.36
+traceroute me
