@@ -1,0 +1,13 @@
+----------------------------------------------------------------------------
+10/13/13 16:38:38 Server started!
+10/13/13 16:38:46 User from IP: 127.0.0.1 close connection instead of typing 'quit'
+----------------------------------------------------------------------------
+10/13/13 16:43:57 Server started!
+10/13/13 16:44:13 User from IP: 127.0.0.1 (with pid 18952) making too many requests
+10/13/13 16:44:13 User from IP: 127.0.0.1 (with pid 18952) making too many requests
+10/13/13 16:44:22 User from IP: 127.0.0.1 get refused because we reached max concurrent users
+10/13/13 16:44:26 User from IP: 127.0.0.1 get refused because we reached max concurrent users
+10/13/13 16:44:33 Automatic time out from 127.0.0.1 (with pid: 18952), after no input of 20 seconds
+10/13/13 16:44:39 Automatic time out from 127.0.0.1 (with pid: 18957), after no input of 20 seconds
+10/13/13 16:44:49 User from IP: 127.0.0.1 (with pid 18961) closes connection from server
+10/13/13 16:45:05 Server receive Interrupt signal, shutting down...
