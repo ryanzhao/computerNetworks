@@ -8,11 +8,17 @@
 // Started: Morning of Thu,Oct 10th 2013 EDT
 // Modified: Thu,Oct 10th 2013 11:18:09 PM EDT 
 //           add client addr as a private member, for traceMe()
-// Last Modified: Thu,Oct 10th 2013 11:36:46 PM EDT
+// Modified: Fri,Oct 11th 2013 04:38:15 PM EDT
+//           add rate limiting functionality
+//           rate limitor is mainly handled by traceIpHost();
+// Last Modified: Sat,Oct 12th 2013 08:14:48 PM EDT
 //----------------------------------------------------------------------------
 #ifndef _INTERACTION_H_
 #define _INTERACTION_H_
 #include"lib/syscallWrap.h"
+#include"rateLimiting.h"
+#include"eventsLog.h"
+extern eventsLog servLog;
 class interaction {
     public:
         //-----------------------
@@ -39,6 +45,8 @@ class interaction {
         char ipHostFname[BUFSIZE];
         // client addr
         struct sockaddr_in *clientAddr;
+        // rate limitor
+        rateLimiting* rLimitor;
         //-----------------------
         // private function calls
         //-----------------------
@@ -57,7 +65,7 @@ class interaction {
         // parse input
         int parseInput();
     public:
-        interaction(int fd, struct sockaddr_in *cliaddr);
+        interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl);
         // return inbuffer pointer
         char* getInBuff() { return inBuff;}
         // take action according to input

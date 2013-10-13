@@ -20,7 +20,7 @@
 //           Add handle for automatic timeout of client if no input for 30sec
 // Modified: Fri,Oct 11th 2013 11:47:43 AM EDT
 //           Finish client server interaction
-// Last Modified: Fri,Oct 11th 2013 12:08:43 PM EDT
+// Last Modified: Fri,Oct 11th 2013 08:37:27 PM EDT
 //----------------------------------------------------------------------------
 #include"progArgs.h"
 #include"lib/syscallWrap.h"
@@ -36,6 +36,7 @@
 #include<sys/time.h>
 #include<sys/wait.h>
 #include"interaction.h"
+#include"rateLimiting.h"
 
 // start server log 
 eventsLog servLog;
@@ -88,6 +89,8 @@ int main(int argc, char** argv) {
         if((chd_pid=fork())< 0) {  
             sys_err("call to fork() failed");
         } else if(chd_pid==0) {     // child process
+            // every connfd has a 'rate-limitor'
+            rateLimiting rateLimitor(pArgs.reqPerSec);
             // restore sigint signal handler
             signal(SIGINT, SIG_DFL);
             //signal(SIGCHLD, SIG_DFL);
@@ -101,7 +104,7 @@ int main(int argc, char** argv) {
                 //-----------------------------------
                 // handles all kinds of client inputs
                 //-----------------------------------
-                interaction inter(connfd, &cliaddr);
+                interaction inter(connfd, &cliaddr, &rateLimitor);
                 FILE* fConn = Fdopen(connfd, "r+");
                 // get input from client
                 fgets(inter.getInBuff(),inter.BUFSIZE, fConn);
@@ -116,8 +119,8 @@ int main(int argc, char** argv) {
                 // log automatic time out
                 char tmp[TEMPBUFFSIZE];
                 char str[INET_ADDRSTRLEN];
-                sprintf(tmp,"Automatic time out from %s (with pid: %d), \
-                        after no input of %d seconds\n",
+                sprintf(tmp,"Automatic time out from %s (with pid: %d), "
+                        "after no input of %d seconds\n",
                         inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)),
                         getpid(), pArgs.timeOut);
                 servLog.logIt(tmp);

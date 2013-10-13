@@ -1,6 +1,6 @@
 CPP = g++
 LD = g++
-TS = progArgs.o eventsLog.o misc.o interaction.o serverMain.o
+TS = progArgs.o eventsLog.o misc.o rateLimiting.o interaction.o serverMain.o
 
 traceServer: $(TS) syscallWrap.o 
 	$(LD) -o traceServer $(TS) syscallWrap.o

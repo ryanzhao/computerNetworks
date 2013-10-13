@@ -4,14 +4,20 @@
 // Indiana University, Bloomington
 //========================================
 // Started: Thu,Oct 10th 2013 11:15:36 PM EDT
-// Last Modified: Fri,Oct 11th 2013 11:45:28 AM EDT
+// Modified: Thu,Oct 10th 2013 11:18:09 PM EDT 
+//           add client addr as a private member, for traceMe()
+// Modified: Fri,Oct 11th 2013 04:38:15 PM EDT
+//           add rate limiting functionality
+//           rate limitor is mainly handled by traceIpHost();
+// Last Modified: Fri,Oct 11th 2013 08:42:41 PM EDT
 //----------------------------------------------------------------------------
 #include"interaction.h"
 #include<cstring>
 #include<arpa/inet.h>
 #include<unistd.h>
 #include"misc.h"
-interaction::interaction(int fd, struct sockaddr_in *cliaddr) {
+interaction::interaction(int fd, struct sockaddr_in *cliaddr, rateLimiting* rl){
+    rLimitor = rl;
     connfd = fd;
     clientAddr = cliaddr;
     memset(inBuff,0, BUFSIZE);
@@ -113,6 +119,12 @@ int interaction::parseInput() {
 
 void interaction::quit() {
     dprintf(connfd, "QUIT Request from client received, quitting...\n");
+    // log this event
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(clientAddr->sin_addr), str,sizeof(str));
+    extern eventsLog servLog;
+    servLog.logIt("User from IP: %s (with pid %d)"
+            "closes connection from server\n", str, getpid());
     Close(connfd);
     exit(0);
 }
@@ -130,6 +142,21 @@ void interaction::help() {
 }
 
 void interaction::traceIpHost(const char* ipHost) {
+    // check if we over limit
+    if(rLimitor->isOverLimit()) {
+        // notify user
+        dprintf(connfd, "*********************************************\n");
+        dprintf(connfd, "Making too many requests than you can\n");
+        dprintf(connfd, "%s\n",rLimitor->currentLimit());
+        dprintf(connfd, "*********************************************\n");
+        // log it
+        char str[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &(clientAddr->sin_addr), str,sizeof(str));
+        extern eventsLog servLog;
+        servLog.logIt("User from IP: %s (with pid %d)"
+                "making too many requests\n", str, getpid());
+        return;
+    }
     pid_t child_pid;
     if((child_pid=fork())<0) {
         sys_err("call to fork() failed");
@@ -158,8 +185,8 @@ void interaction:: invalid() {
 }
 
 void interaction:: traceMe() {
+    memset(ipHostFname, 0, BUFSIZE);
     inet_ntop(AF_INET, &(clientAddr->sin_addr), ipHostFname,BUFSIZE);
-    dprintf(connfd,"%s\n",ipHostFname);
     traceIpHost(ipHostFname);
 }
 
